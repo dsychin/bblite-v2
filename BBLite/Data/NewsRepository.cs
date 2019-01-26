@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using BBLite.Models;
 using Newtonsoft.Json;
 using HtmlAgilityPack;
+using System.Text.RegularExpressions;
 
 namespace BBLite.Data
 {
@@ -15,6 +16,11 @@ namespace BBLite.Data
 
         public async Task<List<ArticleReference>> GetAll(int page = 1)
         {
+            if (page < 1)
+            {
+                throw new ArgumentOutOfRangeException();
+            }
+
             // container for the post request's response
             var resultObject = new ApiResponse();
             using (var client = new HttpClient())
@@ -58,7 +64,7 @@ namespace BBLite.Data
                         news.SelectSingleNode("//h3[contains(@class, 'td-module-title')]/a")
                         .Attributes["href"].Value),
                     Title = news.SelectSingleNode("//h3[contains(@class, 'td-module-title')]/a").InnerText,
-                    Excerpt = news.SelectSingleNode("//div[contains(@class, 'td-excerpt')]").InnerText,
+                    Excerpt = news.SelectSingleNode("//div[contains(@class, 'td-excerpt')]").InnerText.Trim(),
                     ThumbnailUrl = new Uri(
                         news.SelectSingleNode("//div[contains(@class, 'td-module-thumb')]/a/img")
                         .Attributes["src"].Value),
@@ -94,11 +100,15 @@ namespace BBLite.Data
 
             var articleNode = html.DocumentNode.SelectSingleNode("//article");
 
+            // remove escapes from html
+            var htmlContent = articleNode
+                    .SelectSingleNode("//div[contains(@class, 'td-post-content')]").InnerHtml;
+            htmlContent = Regex.Unescape(htmlContent).Trim();
+
             var article = new Article
             {
                 Title = articleNode.SelectSingleNode("//h1").InnerText,
-                HtmlContent = articleNode
-                    .SelectSingleNode("//div[contains(@class, 'td-post-content')]").InnerHtml,
+                HtmlContent = htmlContent,
                 OriginalUrl = targetUrl,
                 PublishedDate = DateTime.Parse(
                     articleNode.SelectSingleNode("//time").Attributes["datetime"].Value)
