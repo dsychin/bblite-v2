@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using BBLite.Models;
 using Newtonsoft.Json;
-using System.Text.RegularExpressions;
 using HtmlAgilityPack;
 
 namespace BBLite.Data
@@ -13,7 +11,7 @@ namespace BBLite.Data
     public class NewsRepository : INewsRepository
     {
         private readonly Uri apiUrl = new Uri("https://borneobulletin.com.bn/wp-admin/admin-ajax.php");
-        private readonly Uri baseUrl = new Uri("https://borneobulletin.com");
+        private readonly Uri baseUrl = new Uri("https://borneobulletin.com.bn");
 
         public async Task<List<ArticleReference>> GetAll(int page = 1)
         {
@@ -46,7 +44,7 @@ namespace BBLite.Data
 
             // Parse the resulting html
             var html = new HtmlDocument();
-            html.LoadHtml(resultObject.server_reply_html_data);
+            html.LoadHtml(resultObject.HtmlData);
 
             var newsNodes = html.DocumentNode.SelectNodes("//*[contains(@class, 'td_module_wrap')]");
 
@@ -76,13 +74,45 @@ namespace BBLite.Data
 
         public async Task<Article> GetArticle(string path)
         {
-            throw new NotImplementedException();
+            // form the url
+            Uri targetUrl = new Uri(baseUrl, path);
+
+            // get the html
+            string responseContent;
+            using (var client = new HttpClient())
+            {
+                using (var response = await client.GetAsync(targetUrl))
+                {
+                    response.EnsureSuccessStatusCode();
+                    responseContent = await response.Content.ReadAsStringAsync();
+                }
+            }
+
+            // parse the html
+            var html = new HtmlDocument();
+            html.LoadHtml(responseContent);
+
+            var articleNode = html.DocumentNode.SelectSingleNode("//article");
+
+            var article = new Article
+            {
+                Title = articleNode.SelectSingleNode("//h1").InnerText,
+                HtmlContent = articleNode
+                    .SelectSingleNode("//div[contains(@class, 'td-post-content')]").InnerHtml,
+                OriginalUrl = targetUrl,
+                PublishedDate = DateTime.Parse(
+                    articleNode.SelectSingleNode("//time").Attributes["datetime"].Value)
+            };
+
+            return article;
         }
     }
 
     public class ApiResponse
     {
-        public int currentPage { get; set; }
-        public string server_reply_html_data { get; set; }
+        [JsonProperty("currentPage")]
+        public int CurrentPage { get; set; }
+        [JsonProperty("server_reply_html_data")]
+        public string HtmlData { get; set; }
     }
 }
