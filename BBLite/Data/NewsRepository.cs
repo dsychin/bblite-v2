@@ -61,15 +61,15 @@ namespace BBLite.Data
                 var article = new ArticleReference
                 {
                     ArticleUrl = new Uri(
-                        news.SelectSingleNode("//h3[contains(@class, 'td-module-title')]/a")
-                        .Attributes["href"].Value),
-                    Title = news.SelectSingleNode("//h3[contains(@class, 'td-module-title')]/a").InnerText,
-                    Excerpt = news.SelectSingleNode("//div[contains(@class, 'td-excerpt')]").InnerText.Trim(),
+                        news.SelectSingleNode(".//h3[contains(@class, 'td-module-title')]/a")
+                        .Attributes["href"].Value).AbsolutePath,
+                    Title = news.SelectSingleNode(".//h3[contains(@class, 'td-module-title')]/a").InnerText,
+                    Excerpt = news.SelectSingleNode(".//div[contains(@class, 'td-excerpt')]").InnerText.Trim(),
                     ThumbnailUrl = new Uri(
-                        news.SelectSingleNode("//div[contains(@class, 'td-module-thumb')]/a/img")
+                        news.SelectSingleNode(".//div[contains(@class, 'td-module-thumb')]/a/img")
                         .Attributes["src"].Value),
                     PublishedDate = DateTime.Parse(
-                        news.SelectSingleNode("//time").Attributes["datetime"].Value)
+                        news.SelectSingleNode(".//time").Attributes["datetime"].Value)
                 };
 
                 result.Add(article);
@@ -107,11 +107,11 @@ namespace BBLite.Data
 
             var article = new Article
             {
-                Title = articleNode.SelectSingleNode("//h1").InnerText,
+                Title = articleNode.SelectSingleNode(".//h1").InnerText,
                 HtmlContent = htmlContent,
                 OriginalUrl = targetUrl,
                 PublishedDate = DateTime.Parse(
-                    articleNode.SelectSingleNode("//time").Attributes["datetime"].Value)
+                    articleNode.SelectSingleNode(".//time").Attributes["datetime"].Value)
             };
 
             return article;

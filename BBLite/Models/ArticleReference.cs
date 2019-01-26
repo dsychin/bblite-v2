@@ -7,7 +7,7 @@ namespace BBLite.Models
 {
     public class ArticleReference
     {
-        public Uri ArticleUrl { get; set; }
+        public string ArticleUrl { get; set; }
         public Uri ThumbnailUrl { get; set; }
         public string Excerpt { get; set; }
         public string Title { get; set; }

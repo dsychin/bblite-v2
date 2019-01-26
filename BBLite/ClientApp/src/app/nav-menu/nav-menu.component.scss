@@ -1,0 +1,17 @@
+nav {
+  background-color: #eee;
+  height: 2rem;
+  padding: 10px;
+
+  .flex-container {
+    display: flex;
+    align-items: center;
+  }
+
+  a {
+    display: block;
+    text-decoration: none;
+    color: black;
+    text-transform: uppercase;
+  }
+}

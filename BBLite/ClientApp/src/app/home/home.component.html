@@ -1,0 +1,16 @@
+<div class="container">
+  <h1>National News</h1>
+  <div class="flex-container">
+    <div class="article" *ngFor="let article of articles">
+      <a href="/article{{ article.articleUrl }}">
+        <div class="text-content">
+          <h2>{{ article.title }}</h2>
+          <small>{{ article.publishedDate | date: 'medium' }}</small>
+        </div>
+        <img src="{{ article.thumbnailUrl }}" alt="{{ article.title }}" />
+      </a>
+    </div>
+  </div>
+  <button *ngIf="currentPage > 1" (click)="prevPage()">Previous</button>
+  <button (click)="nextPage()">Next</button>
+</div>
