@@ -11,6 +11,7 @@ export class HomeComponent implements OnInit {
 
   articles: articleReference[];
   currentPage: number;
+
   constructor(private data: DataService) { }
 
   ngOnInit() {
