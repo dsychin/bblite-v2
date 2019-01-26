@@ -8,7 +8,7 @@ namespace BBLite.Data
 {
     interface INewsRepository
     {
-        Task<IEnumerable<ArticleReference>> GetAll();
+        Task<List<ArticleReference>> GetAll(int page);
         Task<Article> GetArticle(string path);
     }
 }
